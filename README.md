@@ -11,7 +11,7 @@
 
 # FRB Status CLI
 
-A CLI tool to monitor the status of Federal Reserve services and be alerted to issues via Slack.
+A CLI tool to monitor the status of [Federal Reserve services](https://www.frbservices.org/app/status/serviceStatus.do) and be alerted to issues via Slack.
 
 ## Installation
 
