@@ -13,9 +13,13 @@
 
 A CLI tool to monitor the status of Federal Reserve services and be alerted to issues via Slack.
 
-## Usage
+## Installation
 
-### Fetch from API (default)
+```bash
+go install github.com/moov-io/frbstatus@latest
+```
+
+## Usage
 
 ```bash
 ./frbstatus                 # Show all services in table format
@@ -23,7 +27,37 @@ A CLI tool to monitor the status of Federal Reserve services and be alerted to i
 ./frbstatus -format json   # Output in JSON format
 ```
 
-### With Slack alerts
+Example CLI Usage:
+
+```
+$ frbstatus
+```
+```
+FRB Service Status
+==================
+
+SERVICE                        STATUS
+------------------------------ --------------------
+Account Services               Normal Operations
+Central Bank                   Normal Operations
+Check 21                       Normal Operations
+Check Adjustments              Normal Operations
+FedACH                         ⚠️  Service Disruption
+FedCash                        Normal Operations
+FedNow                         Normal Operations
+Fedwire Funds                  Normal Operations
+Fedwire Securities             Normal Operations
+National Settlement            Normal Operations
+FedLine Advantage              Normal Operations
+FedLine Command                Normal Operations
+FedLine Direct                 Normal Operations
+FedLine Web                    Normal Operations
+FedMail                        Normal Operations
+```
+
+## Slack Alerts
+
+Configure the Slack webhook URL to receive alerts for unhealthy services:
 
 ```bash
 SLACK_WEBHOOK_URL="https://hooks.slack.com/services/..." \
@@ -38,28 +72,9 @@ When a Slack webhook URL is configured, the tool will:
   - Latest update timestamps
   - Link to view full details
 
-## Installation
-
-```bash
-go build -o frbstatus
-```
-
-Or run directly:
-
-```bash
-go run .
-```
-
-## Configuration
-
-| Environment Variable | Description |
-|--|------|
-| `SLACK_WEBHOOK_URL` | Slack incoming webhook URL for alerts |
-
 ## Flags
 
-| Flag | Description |
-|--|------|
-| `-file string` | Read HTML from file instead of fetching from API |
+| Flag             | Description                                   |
+|------------------|-----------------------------------------------|
 | `-format string` | Output format: table or json (default: table) |
-| `-unhealthy` | Only report unhealthy services |
+| `-unhealthy`     | Only report unhealthy services                |
