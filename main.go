@@ -16,21 +16,13 @@ import (
 func main() {
 	unhealthyOnly := flag.Bool("unhealthy", false, "only report unhealthy services")
 	format := flag.String("format", "table", "output format (table, json)")
-	file := flag.String("file", "", "read HTML from file instead of fetching from API")
 	flag.Parse()
 
 	client := frbstatus.NewClient()
 
-	var statusPage []byte
-	var err error
-
-	if *file != "" {
-		statusPage, err = os.ReadFile(*file)
-	} else {
-		statusPage, err = client.FetchStatusPage()
-	}
+	statusPage, err := client.FetchStatusPage()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading status page: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error fetching status page: %v\n", err)
 		os.Exit(1)
 	}
 
