@@ -84,3 +84,24 @@ func TestParseAlerts(t *testing.T) {
 		t.Errorf("Expected to find FedACH alert with outage ID 145787, got: %+v", alerts)
 	}
 }
+
+func TestStatusPageParsing(t *testing.T) {
+	content, err := os.ReadFile("testdata/fedach-down.html")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	services := ParseStatusPage(content)
+
+	fedACHFound := false
+	for _, svc := range services {
+		if svc.Name == "FedACH" && IsUnhealthy(svc.Status) {
+			fedACHFound = true
+			break
+		}
+	}
+
+	if !fedACHFound {
+		t.Error("Expected to find FedACH as unhealthy service")
+	}
+}
