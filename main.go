@@ -71,6 +71,9 @@ func outputTable(services []frbstatus.Service, unhealthyOnly bool) {
 		status := svc.Status
 		if frbstatus.IsUnhealthy(svc.Status) {
 			status = fmt.Sprintf("⚠️  %s", svc.Status)
+			if svc.OutletURL != "" {
+				status += fmt.Sprintf(" - %s", svc.OutletURL)
+			}
 		}
 		fmt.Printf("%-30s %s\n", svc.Name, status)
 	}
@@ -82,38 +85,38 @@ func outputJSON(services []frbstatus.Service) {
 }
 
 func sendToSlack(client *frbstatus.StatusClient, webhookURL string, svc frbstatus.Service) {
-	if svc.OutletURL == "" {
-		return
-	}
-
-	outageID := svc.OutletURL
-
-	outageDetail, err := client.FetchOutageDetail(outageID)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error fetching outage detail: %v\n", err)
-		return
-	}
-
-	details := frbstatus.ParseOutageDetail(outageDetail)
-
 	message := fmt.Sprintf(
 		"*⚠️ FRB Service Issue: %s*",
 		svc.Name,
 	)
 
-	if details != "" {
-		lines := strings.Split(details, "\n")
-		for i, line := range lines {
-			if i >= 5 {
-				break
-			}
-			if strings.Contains(line, "Eastern Time") {
-				message += fmt.Sprintf("\n\n%s", line)
+	if strings.Contains(svc.OutletURL, "outage.do") {
+		outageID := frbstatus.ExtractOutageID(svc.OutletURL)
+
+		outageDetail, err := client.FetchOutageDetail(outageID)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error fetching outage detail: %v\n", err)
+			return
+		}
+
+		details := frbstatus.ParseOutageDetail(outageDetail)
+
+		if details != "" {
+			lines := strings.Split(details, "\n")
+			for i, line := range lines {
+				if i >= 5 {
+					break
+				}
+				if strings.Contains(line, "Eastern Time") {
+					message += fmt.Sprintf("\n\n%s", line)
+				}
 			}
 		}
-	}
 
-	message += fmt.Sprintf("\n\n<https://www.frbservices.org/app/status/outage.do?oId=%s|View Details>", outageID)
+		message += fmt.Sprintf("\n\n<%s|View Details>", svc.OutletURL)
+	} else {
+		message += fmt.Sprintf("\n\n<%s|View Details>", svc.DetailURL)
+	}
 
 	webhook := map[string]interface{}{
 		"text": message,

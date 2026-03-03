@@ -136,15 +136,40 @@ func parseServiceTr(trNode *html.Node) Service {
 					}
 					if img.Type == html.ElementNode && img.Data == "a" {
 						for _, attr := range img.Attr {
-							if attr.Key == "href" && strings.Contains(attr.Val, "outage.do") {
-								service.DetailURL = attr.Val
-								service.OutletURL = baseURL + attr.Val
+							if attr.Key == "onclick" {
+								// Extract URL from onclick like location.href='app/status/message.do?serviceId=1' or window.open('...')
+								var url string
+								if strings.Contains(attr.Val, "location.href=") {
+									start := strings.Index(attr.Val, "'") + 1
+									end := strings.LastIndex(attr.Val, "'")
+									if start > 0 && end > start {
+										url = attr.Val[start:end]
+									}
+								} else if strings.Contains(attr.Val, "window.open(") {
+									start := strings.Index(attr.Val, "'") + 1
+									end := strings.LastIndex(attr.Val, "'")
+									if start > 0 && end > start {
+										url = attr.Val[start:end]
+									}
+								}
+								if url != "" {
+									service.DetailURL = baseURL + url
+									service.OutletURL = service.DetailURL
+								}
+							} else if attr.Key == "href" {
+								service.DetailURL = baseURL + attr.Val
+								service.OutletURL = service.DetailURL
 							}
 						}
 					}
 				}
 			}
 		}
+	}
+
+	if service.DetailURL == "" {
+		service.DetailURL = baseURL + "/app/status/serviceStatus.do"
+		service.OutletURL = service.DetailURL
 	}
 
 	return service
