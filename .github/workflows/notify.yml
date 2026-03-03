@@ -1,0 +1,38 @@
+name: Monitor FRB Services
+on:
+  workflow_dispatch:
+  schedule:
+    # before FedACH windows
+    - cron: '30 13 * * *'
+    - cron: '30 14 * * *'
+    - cron: '45 17 * * *'
+    - cron: '45 18 * * *'
+    - cron: '45 19 * * *'
+    - cron: '45 20 * * *'
+    - cron: '30 21 * * *'
+    - cron: '30 22 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  monitor:
+    name: Run frbservices CLI
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v6
+      with:
+        go-version: stable
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+
+    - name: Run
+      run: go run .
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
