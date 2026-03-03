@@ -78,3 +78,7 @@ When a Slack webhook URL is configured, the tool will:
 |------------------|-----------------------------------------------|
 | `-format string` | Output format: table or json (default: table) |
 | `-unhealthy`     | Only report unhealthy services                |
+
+## License
+
+[MIT](LICENSE)
