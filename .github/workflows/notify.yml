@@ -2,15 +2,8 @@ name: Monitor FRB Services
 on:
   workflow_dispatch:
   schedule:
-    # before FedACH windows
-    - cron: '30 13 * * *'
-    - cron: '30 14 * * *'
-    - cron: '45 17 * * *'
-    - cron: '45 18 * * *'
-    - cron: '45 19 * * *'
-    - cron: '45 20 * * *'
-    - cron: '30 21 * * *'
-    - cron: '30 22 * * *'
+    # Every 10th and 40th minute - https://crontab.guru/#10,40_*_*_*_*
+    - cron: '10,40 * * * *'
 
 permissions:
   contents: read
